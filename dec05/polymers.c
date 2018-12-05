@@ -13,7 +13,6 @@ int main(int argc, char** argv)
 
     //
     // parse input stream
-    //   (may as well eliminate pairs on the way in, too)
     //
     {
         char c;
