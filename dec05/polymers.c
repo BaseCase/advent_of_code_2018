@@ -53,15 +53,13 @@ int main(int argc, char** argv)
             //
             // Trim out the unwanted characters before entering the main reduction process.
             //
-            src = (char*) memcpy(src, original_polymer, sizeof(char) * polymer_length);
             for (src_i = 0, dest_i = 0; src_i < polymer_length; ++src_i)
             {
-                if (src[src_i] == skipped_uppercase || src[src_i] == skipped_lowercase)
+                if (original_polymer[src_i] == skipped_uppercase || original_polymer[src_i] == skipped_lowercase)
                     continue;
 
-                dest[dest_i++] = src[src_i];
+                src[dest_i++] = original_polymer[src_i];
             }
-            src = dest;
             src_len = dest_i;
 
             //
