@@ -30,11 +30,12 @@ typedef enum ParserState {
 Node* new_node(int id, int metadata_count, int children_count);
 void print_tree(Node* tree);
 int sum_tree_metadata(Node* tree);
+int calculate_tree_value(Node* tree);
 
 
 int main(int argc, char** argv)
 {
-    int metadata_sum;
+    int metadata_sum, tree_value;
     Node* tree;
 
 
@@ -130,7 +131,9 @@ int main(int argc, char** argv)
 
 
     metadata_sum = sum_tree_metadata(tree);
-    printf("The sum of all metadata fields is %d.\n", metadata_sum);
+    tree_value = calculate_tree_value(tree);
+    printf("The normal sum of all metadata fields is %d.\n", metadata_sum);
+    printf("The weird part2 value for the tree is %d.\n", tree_value);
 }
 
 
@@ -181,4 +184,30 @@ int sum_tree_metadata(Node* tree)
         metadata_sum += sum_tree_metadata(tree->children[i]);
 
     return metadata_sum;
+}
+
+
+int calculate_tree_value(Node* tree)
+{
+    if (tree == NULL)
+        return 0;
+
+    int value = 0;
+    if (tree->possessed_children == 0) {
+        // this is a leaf, so its value is its metadata sum
+        for (int i = 0; i < tree->possessed_metadata; ++i)
+            value += tree->metadata_values[i];
+    } else {
+        // this is *not* a leaf, so its value is the sum of the values of its branches, indexed by #
+        for (int i = 0; i < tree->possessed_metadata; ++i)
+        {
+            int child_position = tree->metadata_values[i] - 1;
+            if (child_position >= tree->possessed_children)
+                continue;
+
+            value += calculate_tree_value(tree->children[child_position]);
+        }
+    }
+
+    return value;
 }
