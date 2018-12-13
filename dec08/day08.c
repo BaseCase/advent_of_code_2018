@@ -28,7 +28,6 @@ typedef enum ParserState {
 
 
 Node* new_node(int id, int metadata_count, int children_count);
-void print_tree(Node* tree);
 int sum_tree_metadata(Node* tree);
 int calculate_tree_value(Node* tree);
 
@@ -148,26 +147,6 @@ Node* new_node(int id, int metadata_count, int children_count)
     n->children = (Node**) malloc(sizeof(Node*) * MAX_CHILDREN); // overkill but whatever it's just 11
 
     return n;
-}
-
-
-void print_tree(Node* tree)
-{
-    if (tree == NULL)
-        return;
-
-    printf("Tree %d has metadata: ", tree->id);
-    for (int i = 0; i < tree->possessed_metadata; ++i)
-        printf(" %d ", tree->metadata_values[i]);
-    printf("\n");
-
-    printf("and children: ");
-    for (int i = 0; i < tree->possessed_children; ++i)
-        printf(" %d ", tree->children[i]->id);
-    printf("\n");
-
-    for (int i = 0; i < tree->possessed_children; ++i)
-        print_tree(tree->children[i]);
 }
 
 
