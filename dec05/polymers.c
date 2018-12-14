@@ -99,8 +99,6 @@ void* reduce_sequence(void* arg)
     src = (char*) malloc(sizeof(char) * polymer_length);
     dest = (char*) malloc(sizeof(char) * polymer_length);
 
-    int smallest_reduced_polymer_length = 50000;
-
     //
     // Copy the source string and trim out the unwanted characters before entering the main reduction process.
     //
@@ -114,38 +112,23 @@ void* reduce_sequence(void* arg)
     src_len = dest_i;
 
     //
-    // loop over chars, keep track of how many eliminations occurred
-    // continue looping until you make it to the end with no eliminations
+    // copy chars from src to dest, removing reactive pairs
     //
-    do {
-        dest_i = 0;
-        eliminations_count = 0;
-
-        for (src_i = 0; src_i < src_len; ++src_i)
-        {
-            if ((src_i != src_len - 1)  // don't need to check pairs if we're on the last char
-                    && is_matched_pair(src[src_i], src[src_i + 1]))
-            {
-                // jump over pairs while copying the string
-                ++eliminations_count;
-                ++src_i;
-                continue;
-            }
-
-            dest[dest_i++] = src[src_i];
+    for (src_i = 0, dest_i = 0; src_i < src_len; ++src_i)
+    {
+        if (!(src_i == src_len - 1) && is_matched_pair(src[src_i], src[src_i + 1])) {
+            ++src_i;
+            continue;
+        } else if (is_matched_pair(src[src_i], dest[dest_i - 1])) {
+            --dest_i;
+            continue;
         }
-        dest[dest_i] = 0;
-        src = dest;
-        src_len = dest_i;
 
-    } while (eliminations_count > 0);
+        dest[dest_i++] = src[src_i];
+    }
 
-    reduced_polymer_length = src_len;
-
-    if ((reduced_polymer_length < smallest_reduced_polymer_length) && (reduced_polymer_length > 0))
-        smallest_reduced_polymer_length = reduced_polymer_length;
-
-    input->reduced_length = smallest_reduced_polymer_length;
+    reduced_polymer_length = dest_i;
+    input->reduced_length = reduced_polymer_length;
 
     return NULL;
 }
