@@ -2,26 +2,26 @@
 
 
 typedef struct RingNode {
-    int value;
+    long long value;
     struct RingNode* clockwise;
     struct RingNode* counterclockwise;
 } RingNode;
 
 
-RingNode* new_ring_node(int value);
+RingNode* new_ring_node(unsigned long long value);
 void insert_ring_node_between(RingNode* to_insert, RingNode* clockwise, RingNode* counterclockwise);
 void remove_ring_node(RingNode* rn);
 
 
 #define PLAYER_COUNT 491
-#define LAST_MARBLE 71058
+#define LAST_MARBLE 7105800ULL
 
 
 // example problem: 10 players; last marble is worth 1618 points: high score is 8317
 // actual problem: 491 players; last marble is worth 71058 points
 int main(int argc, char** argv)
 {
-    int player_scores[PLAYER_COUNT] = {0};
+    unsigned long long player_scores[PLAYER_COUNT] = {0};
     RingNode* current;
 
     //
@@ -44,7 +44,7 @@ int main(int argc, char** argv)
     //
     {
         int current_player = 3;
-        int next_marble_number = 2;
+        unsigned long long next_marble_number = 2;
         RingNode *left, *right, *removee;
 
         while (next_marble_number < LAST_MARBLE)
@@ -74,23 +74,23 @@ int main(int argc, char** argv)
     // find high score
     //
     {
-        int high_score = 0;
+        unsigned long long high_score = 0;
         for (int i = 0; i < PLAYER_COUNT; ++i)
         {
             if (player_scores[i] > high_score)
                 high_score = player_scores[i];
         }
-        printf("High schore is %d.\n", high_score);
+        printf("High score is %llu.\n", high_score);
     }
 }
 
 
-#define POOL_SIZE 100000
+#define POOL_SIZE 8000000ULL
 
-RingNode* new_ring_node(int value)
+RingNode* new_ring_node(unsigned long long value)
 {
     static RingNode node_pool[POOL_SIZE];
-    static int next_node = 0;
+    static unsigned long long next_node = 0;
 
     RingNode* rn = &node_pool[next_node++];
     rn->value = value;
