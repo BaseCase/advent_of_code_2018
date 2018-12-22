@@ -39,6 +39,7 @@ typedef struct Cart {
     int y;
     Direction dir;
     TurnDirection last_turn;
+    int destroyed;  // 1 if this cart has been in a crash
 } Cart;
 
 
@@ -49,7 +50,7 @@ void debug_print(TileType *board, Cart *carts, int cart_count);
 int main(int argc, char** argv)
 {
     TileType board[BOARD_WIDTH * BOARD_HEIGHT];
-    Cart carts[2000];
+    Cart carts[2000] = {0};
     int cart_count = 0;
 
     //
@@ -167,11 +168,12 @@ int main(int argc, char** argv)
     // Run simulation until there's a cart collision
     //
     {
-        int cur, new, collision;
+        int cur, new, collision, remaining_cart_count;
         int move_order[2000];
 
         collision = 0;
-        for (int turn = 1; turn <= 4000; ++turn)
+        remaining_cart_count = cart_count;
+        for (int turn = 1; turn <= 40000; ++turn)
         {
             // determine move order of the carts by sorting them by y, x.
             // bubble sort is totally fine here because there are only 17!
@@ -193,6 +195,9 @@ int main(int argc, char** argv)
             // other carts each turn because there are only 17.
             for (int i = 0; i < cart_count; ++i)
             {
+                if (carts[i].destroyed)  // don't process carts that collided already this turn
+                    continue;
+
                 // move this cart
                 switch (carts[i].dir)
                 {
@@ -291,18 +296,35 @@ int main(int argc, char** argv)
 
                 for (int j = 0; j < cart_count; ++j)
                 {
-                    if (i == j)
+                    if (i == j || carts[j].destroyed)
                         continue;
 
-                    if (carts[j].x == x && carts[j].y == y) {
+                    if (carts[j].x == x && carts[j].y == y)
+                    {
                         printf("COLLISION on turn %d at (%d, %d)!\n", turn, x, y);
                         collision = 1;
+
+                        carts[i].destroyed = 1;
+                        carts[j].destroyed = 1;
+
+                        remaining_cart_count -= 2;
                     }
                 }
             }
 
-            if (collision)
+            if (remaining_cart_count == 1)
+            {
+                Cart last_cart;
+                for (int z = 0; z < cart_count; ++z)
+                {
+                    if (!carts[z].destroyed) {
+                        last_cart = carts[z];
+                        break;
+                    }
+                }
+                printf("Last cart standing! Turn %d, coords (%d,%d)\n", turn, last_cart.x, last_cart.y);
                 break;
+            }
         }
     }
 }
